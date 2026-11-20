@@ -32,7 +32,14 @@ jobs:
           docker swarm init --advertise-addr "$address" >/dev/null
           bash scripts/deploy.sh localhost:5000 "ci-${GITHUB_SHA:0:12}"
       - name: Scale, replace a task and check persisted data
-        run: bash scripts/test.sh
+        id: measure
+        run: |
+          marker=$(mktemp)
+          status=0
+          bash scripts/test.sh || status=$?
+          folder=$(find evidence -name test-results.json -newer "$marker" -printf '%h\n' | sort | tail -1)
+          echo "folder=$folder" >> "$GITHUB_OUTPUT"
+          exit "$status"
       - name: Create and read back a mission in Chrome
         run: |
           python3 -m venv "$RUNNER_TEMP/dronelog-tests"
@@ -42,11 +49,11 @@ jobs:
           python tests/browser_live.py
           python tools/project_report.py
       - name: Preserve measured results
-        if: always()
+        if: always() && steps.measure.outputs.folder != ''
         uses: actions/upload-artifact@v4
         with:
           name: dronelog-evidence
-          path: evidence/run_*/
+          path: ${{ steps.measure.outputs.folder }}/
           if-no-files-found: warn
       - name: Show service start errors
         if: failure()

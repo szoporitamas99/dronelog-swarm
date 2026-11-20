@@ -2,7 +2,7 @@
 
 Felhőszámítás / Cloud Computing projekt. A böngészős alkalmazás drónos feladatokat rögzít, lekérdez, módosít és töröl. Minden bemutatóadat kitalált. A rendszer valódi PostgreSQL-adatbázist és három különböző Swarm-szolgáltatást használ.
 
-Az [élő bemutató forgatókönyve](docs/VEDES.md) a skálázás és a konténerpótlás parancsait is tartalmazza. Helyi futtatáshoz lásd a [Windows-telepítési útmutatót](docs/KEZDES_WINDOWS.md).
+Az [élő bemutató forgatókönyve](docs/VEDES.md) a bemutatógép indítását, a skálázást és a kieső konténer pótlását is bemutatja.
 
 <!-- SUBMISSION:START -->
 ## Beadási adatok
@@ -10,10 +10,23 @@ Az [élő bemutató forgatókönyve](docs/VEDES.md) a skálázás és a konténe
 - [A projekt forráskódja](https://github.com/szoporitamas99/dronelog-swarm)
 - [Rövid projektjelentés (PDF)](docs/DroneLog_Projektjelentes.pdf)
 - [Docker Swarm ellenőrzések a GitHub Actionsben](https://github.com/szoporitamas99/dronelog-swarm/actions/workflows/swarm.yml). A sikeres futás `dronelog-evidence` csomagjában található a mérésből készült PDF, a parancsnapló, a teszteredmények és a böngészős visszaolvasás képe.
-- Nyilvános alkalmazáscím: az élő bemutatóhoz még nincs rögzített URL.
+- [A működő DroneLog megnyitása](https://upgraded-goldfish-vjwqvwg7g4cw5jp-8080.app.github.dev/). Az első megnyitáskor a GitHub **Continue** gombja vezet a naplóhoz. A megtekintés nyilvános, a szerkesztés kulcshoz kötött.
+- [Az élő példány mérési bizonyítékai](evidence/run_20261120T210650141472Z/) · [Védési segédlet és indítás](docs/VEDES.md) · [Beadáshoz kimásolható hivatkozások](docs/BEADAS.txt)
 
-A `scripts/make-report.ps1` az aktuális linkekkel frissíti ezt a részt.
+A nyilvános cím az **upgraded goldfish** nevű Codespace futása alatt él. Ha a gép inaktivitás miatt leállt, a tulajdonos a [Codespaces-listáról](https://github.com/codespaces) indíthatja újra. Az alábbi Windows-telepítés ugyanennek a rendszernek a saját gépen futtatható változata.
 <!-- SUBMISSION:END -->
+
+### Az élő bemutatógép ellenőrzése · 2026. november 20.
+
+| Tanári követelmény | Mért eredmény |
+| --- | --- |
+| Rögzítés a webes felületen | A Chromium űrlapon beküldött `DL-0005` rekord HTTP 201 választ kapott, majd oldalfrissítés után újra megjelent. |
+| Skálázás | A backend a mérésben 2-ről 3 futó példányra bővült, majd visszaállt 2-re. |
+| Automatikus helyreállás | A leállított `wepptm71sjlq` taskot a Swarm a `7wcilnk4uz8r` taskkal pótolta. |
+| Tartós adattárolás | A PostgreSQL-konténer újralétrehozása után a `DL-0004` rekord megmaradt a mentett „befejezett” állapotban. |
+| Külső elérés | A nyilvános HTTPS-címen öt rekord jelent meg egy külön böngészőben, köztük a két tesztrekord. |
+
+![A DroneLog nyilvános felülete a két ellenőrzött rekorddal](evidence/run_20261120T210650141472Z/public-readback.jpg)
 
 ## 1. Funkciók
 
@@ -30,7 +43,7 @@ Ez oktatási feladatnyilvántartó, nem repülésvezérlő vagy hatósági repü
 
 ```mermaid
 flowchart TD
-  Visitor["Külső böngésző"] -->|HTTPS| Tunnel["Cloudflare Quick Tunnel"]
+  Visitor["Külső böngésző"] -->|HTTPS| Tunnel["GitHub Codespaces nyilvános port"]
   Tunnel -->|"HTTP · localhost:8080"| Web["frontend · Nginx · 1 replika"]
   Web -->|"app_net overlay · backend:8000"| API["backend · FastAPI · 2 replika"]
   API -->|"data_net overlay · db:5432"| DB["db · PostgreSQL · 1 replika"]
@@ -45,7 +58,9 @@ flowchart TD
 | `dronelog_backend` | Python/FastAPI, validálás, jogosultság, SQL | 2 | nincs |
 | `dronelog_db` | PostgreSQL, séma és perzisztencia | 1 | nincs |
 
-Három különböző alkalmazásszolgáltatás, alaphelyzetben négy alkalmazáskonténer. A cloudflared a gépen futó külön tunnel-folyamat, nem számít bele a háromba. A frontend csak a `app_net`, az adatbázis csak a `data_net` overlay hálózaton van; az API mindkettőhöz kapcsolódik. A backend service nevén érhető el, a Swarm szolgáltatásfelderítése és VIP-je kapcsolja a kéréseket a taskokhoz.
+Alaphelyzetben a három szolgáltatás négy alkalmazáskonténert futtat. A bemutatógépen a telepítő a `localhost:5000` registrybe tölti fel a saját image-eket. A Swarm a frontend 8080-as portját `mode: host` beállítással nyitja meg, ezt továbbítja a nyilvános HTTPS-címre a GitHub. A saját gépen futtatott változatnál a külső elérést a cloudflared biztosíthatja.
+
+A frontend az `app_net`, az adatbázis a `data_net` overlay hálózaton van. Az API mindkettőhöz kapcsolódik. Az Nginx a `backend` szolgáltatásnévre küldi a kéréseket, a Swarm pedig a szolgáltatás virtuális IP-címén keresztül továbbítja azokat a futó példányoknak.
 
 Az adatbázis a `dronelog.db=true` címkéjű node-ra van kötve, mert a local driverrel létrehozott volume annak a node-nak a lemezén él. A bemutató egy node-ra készült. Több node-ra bővítésnél ez a megkötés továbbra is szükséges, vagy valódi közös tároló és külön adatbázis-HA-megoldás kell.
 

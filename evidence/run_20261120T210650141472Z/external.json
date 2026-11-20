@@ -1,0 +1,10 @@
+{
+  "status": "passed",
+  "checked_at": "2026-11-20T21:08:10Z",
+  "url": "https://upgraded-goldfish-vjwqvwg7g4cw5jp-8080.app.github.dev/",
+  "method": "A Codespace-től különálló böngésző a nyilvános HTTPS-címen, a GitHub Continue gombja után. Az alkalmazás csak olvasható nézetben nyílt meg.",
+  "observation": "Öt feladat. A böngészőben mentett DL-0005 rekord és a konténercsere után megőrzött DL-0004 is látható. Az API és az adatbázis elérhető.",
+  "browser_record_id": 5,
+  "persistence_record_id": 4,
+  "screenshot": "public-readback.jpg"
+}

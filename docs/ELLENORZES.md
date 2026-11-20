@@ -1,5 +1,7 @@
 # Ellenőrzési jegyzet a leszállított forráscsomaghoz
 
+Az élő Codespaces-példány november 20-i Swarm-mérései, a külső böngészős ellenőrzés és a képernyőképek a [bemutató mérési mappájában](../evidence/run_20261120T210650141472Z/) érhetők el. Az alábbi táblázat a korábbi fejlesztési állapotot rögzíti.
+
 Dátum: 2026. november 20. A dokumentum a fejlesztéskor ténylegesen elvégzett ellenőrzéseket rögzíti. A saját gépen futó Swarm mérései később, külön az `evidence/run_...` könyvtárba kerülnek.
 
 | Ellenőrzés | Eredmény | Mit bizonyít, és mit nem? |

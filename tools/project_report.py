@@ -1,12 +1,12 @@
 """Build the short Hungarian project PDF from the evidence available in this checkout."""
 import json
-import os
 from pathlib import Path
 from xml.sax.saxutils import escape
 
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle
+from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import Image, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
@@ -14,8 +14,15 @@ from reportlab.platypus import Image, PageBreak, Paragraph, SimpleDocTemplate, S
 
 root = Path(__file__).resolve().parents[1]
 repository = "https://github.com/szoporitamas99/dronelog-swarm"
-fonts = (Path("C:/Windows/Fonts/segoeui.ttf"), Path("C:/Windows/Fonts/segoeuib.ttf")) if os.name == "nt" else (
-    Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"), Path("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"))
+font_pairs = (
+    ("C:/Windows/Fonts/segoeui.ttf", "C:/Windows/Fonts/segoeuib.ttf"),
+    ("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"),
+    ("/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf", "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf"),
+    ("/usr/share/fonts/truetype/liberation2/LiberationSans-Regular.ttf", "/usr/share/fonts/truetype/liberation2/LiberationSans-Bold.ttf"),
+)
+fonts = next((pair for pair in font_pairs if all(Path(f).exists() for f in pair)), None)
+if fonts is None:
+    raise SystemExit("Install fonts-dejavu-core to render the Hungarian report.")
 for name, font in zip(("Body", "Strong"), fonts):
     pdfmetrics.registerFont(TTFont(name, str(font)))
 ink = colors.HexColor("#163749")
@@ -84,6 +91,10 @@ labels = {"preflight": "Swarm készenlét", "functional_api": "API-írás és vi
 states = {"passed": "Sikeres", "failed": "Sikertelen", "skipped": "Kihagyva"}
 if run:
     flow.append(para("Swarm-futtatás (UTC): " + escape(run["started_at"])))
+    environment = run.get("environment", {})
+    if environment.get("docker_server_version"):
+        flow.append(para("Docker Engine " + escape(environment["docker_server_version"]) + " · " +
+                         ("egy manager node" if environment.get("single_node") else "több node"), 9))
 else:
     flow.append(para("A dokumentum a forráscsomaghoz mellékelt fejlesztői méréseket tartalmazza. Swarm-mérési napló még nem áll rendelkezésre."))
 rows = []
@@ -119,6 +130,11 @@ if directory:
     if browser and screen.exists():
         flow += [PageBreak(), para("WEBES FELÜLET", 10, True, teal), para("Visszaolvasás frissítés után", 21, True),
                  Spacer(1, 8), para(escape(browser["title"])), Spacer(1, 14), Image(str(screen), width=495, height=330)]
+    if external:
+        proof = directory / external["screenshot"]
+        width, height = ImageReader(str(proof)).getSize()
+        flow += [Spacer(1, 12), para("A külön böngészőből megnyitott nyilvános nézet", 13, True), Spacer(1, 6),
+                 Image(str(proof), width=495, height=495 * height / width)]
 
 
 def footer(canvas, doc):

@@ -1,6 +1,7 @@
 """Create a mission through the deployed frontend and find it after a reload."""
 import datetime as dt
 import json
+import os
 from pathlib import Path
 
 from playwright.sync_api import expect, sync_playwright
@@ -10,7 +11,7 @@ evidence = sorted((root / "evidence").glob("run_*/test-results.json"))[-1].paren
 title = f"Böngészős próbarepülés {dt.datetime.now(dt.timezone.utc):%Y%m%d-%H%M%S}"
 token = (root / ".secrets/admin_token.txt").read_text(encoding="utf-8").strip()
 with sync_playwright() as playwright:
-    browser = playwright.chromium.launch(channel="chrome", headless=True)
+    browser = playwright.chromium.launch(channel=os.environ.get("DRONELOG_BROWSER_CHANNEL", "chrome") or None, headless=True)
     page = browser.new_page(viewport={"width": 1440, "height": 960}, locale="hu-HU")
     page.goto("http://localhost:8080")
     page.locator("#new-mission").click()

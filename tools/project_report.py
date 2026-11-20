@@ -51,6 +51,8 @@ directory = results[-1].parent if results else None
 checks = {c["id"]: c for c in run.get("checks", [])}
 browser_file = directory / "browser.json" if directory else None
 browser = json.loads(browser_file.read_text(encoding="utf-8")) if browser_file and browser_file.exists() else {}
+external_file = directory / "external.json" if directory else None
+external = json.loads(external_file.read_text(encoding="utf-8")) if external_file and external_file.exists() else {}
 flow += [para("FELHŐSZÁMÍTÁS   /   GYAKORLATI PROJEKT", 10, True, teal),
          para("DroneLog", 32, True), para("Drónos feladatnapló Docker Swarm környezetben", 15),
          Spacer(1, 12), para("A felhasználó egy drónos feladat helyét, dátumát, állapotát és repülési idejét rögzíti. "
@@ -71,6 +73,10 @@ flow.extend([Spacer(1, 6), para("A helyi bemutatón a Cloudflare Quick Tunnel az
 section("Projekt és bemutató")
 flow.append(para(f'<link href="{repository}" color="#007B75">{repository}</link><br/>'
                  f'<link href="{repository}/blob/main/docs/VEDES.md" color="#007B75">Élő bemutató forgatókönyve</link>'))
+public_url = run.get("urls", {}).get("public")
+if public_url:
+    safe_url = escape(public_url, {'"': '&quot;'})
+    flow.extend([Spacer(1, 5), para(f'Nyilvános alkalmazás: <link href="{safe_url}" color="#007B75">{safe_url}</link>', 9)])
 flow.append(PageBreak())
 flow.extend([para("MÉRÉSI JEGYZŐKÖNYV", 10, True, teal), para("A próbák eredményei", 24, True)])
 labels = {"preflight": "Swarm készenlét", "functional_api": "API-írás és visszaolvasás", "scale": "Skálázás",
@@ -97,6 +103,8 @@ for key, label in labels.items():
     rows.append([label, states.get(check.get("status"), "Függőben"), detail])
 rows.append(["Webes űrlap", states.get(browser.get("status"), "Függőben"),
              f"Chrome, HTTP {browser['http']}, #{browser['id']}. Frissítés után ugyanaz a cím látható." if browser else "A rögzítés és visszaolvasás böngészős igazolása hiányzik."])
+if external:
+    rows.append(["Külső böngésző", states.get(external.get("status"), "Függőben"), external["observation"]])
 grid(["Próba", "Állapot", "Megfigyelés"], rows, [119, 79, 301])
 section("Korábbi fejlesztői ellenőrzések")
 passed = sum(c["status"] == "passed" for c in development["checks"])

@@ -1,0 +1,11 @@
+{
+  "name": "DroneLog Swarm",
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "forwardPorts": [8080],
+  "portsAttributes": {
+    "8080": { "label": "DroneLog", "onAutoForward": "silent" },
+    "5000": { "label": "Local image registry", "onAutoForward": "ignore" }
+  },
+  "otherPortsAttributes": { "onAutoForward": "ignore" },
+  "postCreateCommand": "bash scripts/codespace.sh"
+}

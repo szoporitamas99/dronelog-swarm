@@ -68,8 +68,8 @@ section("Telepítés és elérés")
 flow.append(para("A telepítő a két saját Dockerfile-ból verziózott image-et épít és registrybe tölti. "
                  "A manager node-on létrehozza a Docker secreteket és a tartós kötetet, majd a docker stack deploy paranccsal indítja a három szolgáltatást. "
                  "A webes íráshoz szerkesztőkulcs kell. Olvasáshoz elegendő a webcím."))
-flow.extend([Spacer(1, 6), para("A helyi bemutatón a Cloudflare Quick Tunnel az alkalmazás 8080-as portjához ad ideiglenes HTTPS-címet. "
-                                "A Dockernek és a tunnelnek a teljes bemutató alatt futnia kell. A gép kiesése egyetlen node esetén leállítja a rendszert.")])
+flow.extend([Spacer(1, 6), para("A GitHub Codespaces bemutatógépen a registry csak helyben érhető el. A GitHub a frontend 8080-as portját teszi elérhetővé nyilvános HTTPS-címen. "
+                                "A gépnek a bemutató alatt futnia kell. Saját számítógépen ugyanehhez a belépési ponthoz Cloudflare Quick Tunnel is használható.")])
 section("Projekt és bemutató")
 flow.append(para(f'<link href="{repository}" color="#007B75">{repository}</link><br/>'
                  f'<link href="{repository}/blob/main/docs/VEDES.md" color="#007B75">Élő bemutató forgatókönyve</link>'))
@@ -102,7 +102,7 @@ for key, label in labels.items():
     else: detail = data.get("error") or data.get("reason") or "Nincs csatolt futtatási eredmény."
     rows.append([label, states.get(check.get("status"), "Függőben"), detail])
 rows.append(["Webes űrlap", states.get(browser.get("status"), "Függőben"),
-             f"Chrome, HTTP {browser['http']}, #{browser['id']}. Frissítés után ugyanaz a cím látható." if browser else "A rögzítés és visszaolvasás böngészős igazolása hiányzik."])
+             f"{browser.get('browser', 'Chrome')}, HTTP {browser['http']}, #{browser['id']}. Frissítés után ugyanaz a cím látható." if browser else "A rögzítés és visszaolvasás böngészős igazolása hiányzik."])
 if external:
     rows.append(["Külső böngésző", states.get(external.get("status"), "Függőben"), external["observation"]])
 grid(["Próba", "Állapot", "Megfigyelés"], rows, [119, 79, 301])

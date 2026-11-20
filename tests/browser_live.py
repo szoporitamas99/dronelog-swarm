@@ -10,8 +10,11 @@ root = Path(__file__).resolve().parents[1]
 evidence = sorted((root / "evidence").glob("run_*/test-results.json"))[-1].parent
 title = f"Böngészős próbarepülés {dt.datetime.now(dt.timezone.utc):%Y%m%d-%H%M%S}"
 token = (root / ".secrets/admin_token.txt").read_text(encoding="utf-8").strip()
+channel = os.environ.get("DRONELOG_BROWSER_CHANNEL", "chrome")
+browser_name = "Chrome" if channel == "chrome" else "Chromium"
 with sync_playwright() as playwright:
-    browser = playwright.chromium.launch(channel=os.environ.get("DRONELOG_BROWSER_CHANNEL", "chrome") or None, headless=True)
+    browser = playwright.chromium.launch(channel=channel or None, headless=True)
+    version = browser.version
     page = browser.new_page(viewport={"width": 1440, "height": 960}, locale="hu-HU")
     page.goto("http://localhost:8080")
     page.locator("#new-mission").click()
@@ -33,7 +36,8 @@ with sync_playwright() as playwright:
     page.screenshot(path=str(evidence / "browser-readback.png"))
     browser.close()
 
-result = {"status": "passed", "method": "Chrome: form submission, page reload, visible record",
+result = {"status": "passed", "method": "Form submission, page reload, visible record", "browser": browser_name,
+          "browser_version": version,
           "checked_at": dt.datetime.now(dt.timezone.utc).isoformat(),
           "id": mission["id"], "title": title, "http": 201}
 (evidence / "browser.json").write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")

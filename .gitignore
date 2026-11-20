@@ -1,0 +1,19 @@
+# Never publish local secrets or credentials.
+.secrets/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+node_modules/
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+# Generated evidence is deliberately not ignored: review it, then commit it.
+# The supplied scripts never record the administrator token.

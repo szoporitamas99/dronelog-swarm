@@ -1,0 +1,9 @@
+{
+  "name": "dronelog-development-tests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Optional DOM/API contract tests, not application runtime",
+  "devDependencies": {
+    "jsdom": "26.1.0"
+  }
+}

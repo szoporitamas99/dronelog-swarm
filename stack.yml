@@ -1,0 +1,150 @@
+version: "3.8"
+
+# docker stack deploy does NOT read .env. The deployment scripts export these
+# variables explicitly. Every service uses an image already pushed to a registry.
+services:
+  frontend:
+    image: "${DOCKERHUB_USER:?Set DOCKERHUB_USER}/dronelog-frontend:${APP_TAG:-1.0.0}"
+    networks:
+      - app_net
+    ports:
+      - target: 8080
+        published: 8080
+        protocol: tcp
+        mode: ingress
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
+      update_config:
+        parallelism: 1
+        order: start-first
+        failure_action: rollback
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 128M
+        reservations:
+          memory: 32M
+
+  backend:
+    image: "${DOCKERHUB_USER:?Set DOCKERHUB_USER}/dronelog-backend:${APP_TAG:-1.0.0}"
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: dronelog
+      DB_USER: dronelog
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      ADMIN_TOKEN_FILE: /run/secrets/admin_token
+    secrets:
+      - source: db_password
+        target: db_password
+      - source: admin_token
+        target: admin_token
+    networks:
+      - app_net
+      - data_net
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3).read()"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: any
+        delay: 5s
+      update_config:
+        parallelism: 1
+        order: start-first
+        failure_action: rollback
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 256M
+        reservations:
+          memory: 64M
+
+  db:
+    image: postgres:17.12-alpine3.24
+    environment:
+      POSTGRES_DB: dronelog
+      POSTGRES_USER: dronelog
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - source: db_password
+        target: db_password
+    configs:
+      - source: db_init_v1
+        target: /docker-entrypoint-initdb.d/001-init.sql
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - data_net
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "dronelog", "-d", "dronelog"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    stop_grace_period: 30s
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.dronelog.db == true
+      restart_policy:
+        condition: any
+        delay: 5s
+      update_config:
+        parallelism: 1
+        order: stop-first
+        failure_action: rollback
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 512M
+        reservations:
+          memory: 128M
+
+networks:
+  app_net:
+    driver: overlay
+  data_net:
+    driver: overlay
+    internal: true
+
+volumes:
+  pgdata:
+    external: true
+    name: dronelog_pgdata
+
+secrets:
+  db_password:
+    external: true
+    name: dronelog_db_password
+  admin_token:
+    external: true
+    name: dronelog_admin_token
+
+configs:
+  db_init_v1:
+    file: ./database/init.sql

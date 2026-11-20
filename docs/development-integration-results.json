@@ -1,0 +1,89 @@
+{
+  "date": "2026-11-20",
+  "scope": "Real PostgreSQL and FastAPI integration in development; no Docker/Swarm execution",
+  "database_version": "PostgreSQL 16.2 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 10.2.1 20210130 (Red Hat 10.2.1-11), 64-bit",
+  "checks": [
+    {
+      "name": "readiness with real database",
+      "status": "passed",
+      "details": null
+    },
+    {
+      "name": "three SQL demo records loaded",
+      "status": "passed",
+      "details": null
+    },
+    {
+      "name": "completed minutes only",
+      "status": "passed",
+      "details": null
+    },
+    {
+      "name": "unauthorized mutation denied",
+      "status": "passed",
+      "details": null
+    },
+    {
+      "name": "authenticated insert to PostgreSQL",
+      "status": "passed",
+      "details": {
+        "id": 4
+      }
+    },
+    {
+      "name": "literal SQL-like title preserved and table intact",
+      "status": "passed",
+      "details": null
+    },
+    {
+      "name": "planned flight excluded from sum",
+      "status": "passed",
+      "details": null
+    },
+    {
+      "name": "real SQL update",
+      "status": "passed",
+      "details": null
+    },
+    {
+      "name": "updated completed sum",
+      "status": "passed",
+      "details": null
+    },
+    {
+      "name": "invalid payload rejected",
+      "status": "passed",
+      "details": null
+    },
+    {
+      "name": "database outage reports 503",
+      "status": "passed",
+      "details": null
+    },
+    {
+      "name": "record persists across real PostgreSQL process restart",
+      "status": "passed",
+      "details": null
+    },
+    {
+      "name": "real SQL delete",
+      "status": "passed",
+      "details": null
+    },
+    {
+      "name": "second delete yields 404",
+      "status": "passed",
+      "details": null
+    },
+    {
+      "name": "demo records preserved",
+      "status": "passed",
+      "details": null
+    }
+  ],
+  "limitations": [
+    "Local PostgreSQL 16.2; target image is PostgreSQL 17.12",
+    "ASGI TestClient; Nginx/overlay/containers not involved",
+    "Database process restart is not the required container recreation evidence"
+  ]
+}

@@ -1,0 +1,50 @@
+name: DroneLog Swarm
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'database/**'
+      - 'tests/**'
+      - 'scripts/**'
+      - 'stack.yml'
+      - 'tools/project_report.py'
+      - '.github/workflows/swarm.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Build, push and deploy on one Swarm manager
+        run: |
+          docker run -d --name dronelog-registry -p 127.0.0.1:5000:5000 registry:2.8.3
+          curl --fail --retry 12 --retry-all-errors http://127.0.0.1:5000/v2/
+          address=$(ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1)}')
+          docker swarm init --advertise-addr "$address" >/dev/null
+          bash scripts/deploy.sh localhost:5000 "ci-${GITHUB_SHA:0:12}"
+      - name: Scale, replace a task and check persisted data
+        run: bash scripts/test.sh
+      - name: Create and read back a mission in Chrome
+        run: |
+          python3 -m venv "$RUNNER_TEMP/dronelog-tests"
+          source "$RUNNER_TEMP/dronelog-tests/bin/activate"
+          pip install --disable-pip-version-check playwright==1.55.0 reportlab==4.4.3
+          echo "::add-mask::$(cat .secrets/admin_token.txt)"
+          python tests/browser_live.py
+          python tools/project_report.py
+      - name: Preserve measured results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dronelog-evidence
+          path: evidence/run_*/
+          if-no-files-found: warn

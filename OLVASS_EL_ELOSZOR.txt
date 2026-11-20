@@ -1,0 +1,30 @@
+DRONELOG - DOCKER SWARM PROJEKT
+
+1. Nyisd meg: docs/DroneLog_Telepitesi_utmutato.pdf
+   A masolhato reszletes lepesek: docs/KEZDES_WINDOWS.md
+
+2. Docker Desktop legyen elinditva Linux containers modban.
+
+3. A projekt mappajaban, a SAJAT_DOCKERHUB_NEV cserelendo:
+   docker login -u SAJAT_DOCKERHUB_NEV
+   powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\deploy.ps1 -DockerHubUser SAJAT_DOCKERHUB_NEV
+
+4. Helyi app: http://localhost:8080
+   A titkos szerkesztokulcs: .secrets/admin_token.txt
+   Ezt ne toltsd GitHubra, es ne tedd a beadasba!
+
+5. Kulon terminalban:
+   cloudflared tunnel --url http://localhost:8080
+   A tenylegesen kiirt HTTPS URL a tanarnak adando alkalmazascim.
+
+6. Futtasd a test.ps1-et, keszitsd el a make-report.ps1 segitsegevel
+   a sajat meresi dokumentaciot, es toltsd fel a forrast GitHubra.
+   Minden pontos parancs es feltoltesi lepes a PDF/Markdown utmutatoban.
+
+Beadando: Git repository link + mukodo nyilvanos URL + rovid PDF.
+A jelenlegi csomag kesz forras es segedletek; a sajat gepen tortent
+Swarm-telepitest es a nyilvanos elerest a sajat futtatas igazolja.
+
+Vedes: docs/VEDES.md
+Kovetelmenyek: docs/KOVETELMENYEK.md
+Tenylegesen elvegzett fejlesztoi ellenorzesek: docs/ELLENORZES.md

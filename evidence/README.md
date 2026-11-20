@@ -2,9 +2,9 @@
 
 A telepítés és a `scripts/test.ps1` sikeres vagy hibás futása után itt jönnek létre az `run_...` almappák. A csomag nem tartalmaz előre gyártott sikeres Swarm-mérést.
 
-Minden futásban `commands.txt` és `test-results.json` keletkezik. A jelentéskészítő külön `manual-checks.json` fájlban rögzítheti az általad valóban elvégzett webes és külső hálózati próbát.
+Minden futásban `commands.txt` és `test-results.json` keletkezik. A jelentéskészítő külön `manual-checks.json` fájlban rögzít.
 
-Javasolt képernyőképek a saját `screenshots` almappádba:
+Képernyőképek a `screenshots` almappába:
 
 1. `01-webes-rogzites.png` – új feladat, majd frissítés után is látszó rekord.
 2. `02-swarm-services.png` – három service, alaphelyzetben 1/1, 2/2, 1/1 replikák.
@@ -13,4 +13,3 @@ Javasolt képernyőképek a saját `screenshots` almappádba:
 5. `05-perzisztencia.png` – DB-taskcsere után a korábbi feladat.
 6. `06-kulso-eleres.png` – a tényleges nyilvános URL és a felület másik hálózatról.
 
-A nyers parancskimenet a kiírás szerint önmagában is használható bizonyíték az automatikus pontokhoz. A titkos kulcs, adatbázisjelszó és registry-token soha ne jelenjen meg a képeken.

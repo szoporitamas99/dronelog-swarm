@@ -1,0 +1,68 @@
+2026-11-20T21:06:50.427364+00:00 > docker node ls
+2026-11-20T21:06:50.454276+00:00 ID                            HOSTNAME            STATUS    AVAILABILITY   MANAGER STATUS   ENGINE VERSION
+9fsetbtndw628pmjq6oy2d7sr *   codespaces-d633fa   Ready     Active         Leader           28.1.1-1
+2026-11-20T21:06:50.454356+00:00 > docker stack services dronelog
+2026-11-20T21:06:50.470074+00:00 ID             NAME                MODE         REPLICAS   IMAGE                                                PORTS
+12pw1gnqe0iv   dronelog_backend    replicated   2/2        localhost:5000/dronelog-backend:demo-2b463c944d55    
+uciksfhz8ojm   dronelog_db         replicated   1/1        postgres:17.12-alpine3.24                            
+85qzdfah5r69   dronelog_frontend   replicated   1/1        localhost:5000/dronelog-frontend:demo-2b463c944d55
+2026-11-20T21:06:50.470149+00:00 > docker network inspect --format {{.Name}} driver={{.Driver}} scope={{.Scope}} internal={{.Internal}} dronelog_app_net dronelog_data_net
+2026-11-20T21:06:50.485788+00:00 dronelog_app_net driver=overlay scope=swarm internal=false
+dronelog_data_net driver=overlay scope=swarm internal=true
+2026-11-20T21:06:50.485857+00:00 > docker volume inspect --format {{.Name}} driver={{.Driver}} scope={{.Scope}} dronelog_pgdata
+2026-11-20T21:06:50.499514+00:00 dronelog_pgdata driver=local scope=local
+2026-11-20T21:06:50.499585+00:00 > docker secret ls --format {{.Name}}
+2026-11-20T21:06:50.513659+00:00 dronelog_admin_token
+dronelog_db_password
+2026-11-20T21:06:50.513745+00:00 > docker service inspect --format {{.Spec.Name}} image={{.Spec.TaskTemplate.ContainerSpec.Image}} dronelog_frontend
+2026-11-20T21:06:50.529571+00:00 dronelog_frontend image=localhost:5000/dronelog-frontend:demo-2b463c944d55@sha256:ff08587a15f3a6d02134516204c885e67019023baed34c8cc773226ffb34d091
+2026-11-20T21:06:50.529647+00:00 > docker service inspect --format {{.Spec.Name}} image={{.Spec.TaskTemplate.ContainerSpec.Image}} dronelog_backend
+2026-11-20T21:06:50.545358+00:00 dronelog_backend image=localhost:5000/dronelog-backend:demo-2b463c944d55@sha256:75593ebc07b2d04fef4a3446073ca07d44e9ec28051ae9e06501243f46a91329
+2026-11-20T21:06:50.545434+00:00 > docker service inspect --format {{.Spec.Name}} image={{.Spec.TaskTemplate.ContainerSpec.Image}} dronelog_db
+2026-11-20T21:06:50.562194+00:00 dronelog_db image=postgres:17.12-alpine3.24@sha256:526f86d93c6ea08fd3f1fe5605650cacc781b2c6013169a0ad8f42c7d3d84f32
+2026-11-20T21:06:50.562296+00:00 [PASSED] preflight: Swarm manager and application readiness
+2026-11-20T21:06:50.562361+00:00 > HTTP POST http://localhost:8080/api/missions
+2026-11-20T21:06:50.566027+00:00 > HTTP POST http://localhost:8080/api/missions
+2026-11-20T21:06:50.588635+00:00 > HTTP GET http://localhost:8080/api/missions?limit=500
+2026-11-20T21:06:50.602660+00:00 > HTTP PATCH http://localhost:8080/api/missions/4
+2026-11-20T21:06:50.624204+00:00 [PASSED] functional_api: Authenticated create, read and update; unauthenticated write rejected
+2026-11-20T21:06:50.624351+00:00 > docker service scale --detach=true dronelog_backend=2
+2026-11-20T21:06:50.644649+00:00 dronelog_backend scaled to 2
+2026-11-20T21:06:50.679928+00:00 > docker stack services dronelog
+2026-11-20T21:06:50.695901+00:00 ID             NAME                MODE         REPLICAS   IMAGE                                                PORTS
+12pw1gnqe0iv   dronelog_backend    replicated   2/2        localhost:5000/dronelog-backend:demo-2b463c944d55    
+uciksfhz8ojm   dronelog_db         replicated   1/1        postgres:17.12-alpine3.24                            
+85qzdfah5r69   dronelog_frontend   replicated   1/1        localhost:5000/dronelog-frontend:demo-2b463c944d55
+2026-11-20T21:06:50.695978+00:00 > docker service scale --detach=true dronelog_backend=3
+2026-11-20T21:06:50.716253+00:00 dronelog_backend scaled to 3
+2026-11-20T21:06:56.877761+00:00 > docker stack services dronelog
+2026-11-20T21:06:56.894799+00:00 ID             NAME                MODE         REPLICAS   IMAGE                                                PORTS
+12pw1gnqe0iv   dronelog_backend    replicated   3/3        localhost:5000/dronelog-backend:demo-2b463c944d55    
+uciksfhz8ojm   dronelog_db         replicated   1/1        postgres:17.12-alpine3.24                            
+85qzdfah5r69   dronelog_frontend   replicated   1/1        localhost:5000/dronelog-frontend:demo-2b463c944d55
+2026-11-20T21:06:56.894888+00:00 [PASSED] scale: Backend scaled from two to three running replicas
+2026-11-20T21:06:56.948931+00:00 > docker stop --time 5 cb0436613036
+2026-11-20T21:06:57.374001+00:00 Flag --time has been deprecated, use --timeout instead
+cb0436613036
+2026-11-20T21:07:09.731980+00:00 > docker service ps --no-trunc dronelog_backend
+2026-11-20T21:07:09.753228+00:00 ID                          NAME                     IMAGE                                                                                                                       NODE                DESIRED STATE   CURRENT STATE             ERROR     PORTS
+fvhr1mmb1mzuscrkfhrbf0ebk   dronelog_backend.1       localhost:5000/dronelog-backend:demo-2b463c944d55@sha256:75593ebc07b2d04fef4a3446073ca07d44e9ec28051ae9e06501243f46a91329   codespaces-d633fa   Running         Running 58 seconds ago              
+lj9awczfpgzs9pxihxo6xjii6   dronelog_backend.2       localhost:5000/dronelog-backend:demo-2b463c944d55@sha256:75593ebc07b2d04fef4a3446073ca07d44e9ec28051ae9e06501243f46a91329   codespaces-d633fa   Running         Running 58 seconds ago              
+7wcilnk4uz8rbewvqm0j4a7j2   dronelog_backend.3       localhost:5000/dronelog-backend:demo-2b463c944d55@sha256:75593ebc07b2d04fef4a3446073ca07d44e9ec28051ae9e06501243f46a91329   codespaces-d633fa   Running         Running 1 second ago                
+wepptm71sjlq7of7e382sy51a    \_ dronelog_backend.3   localhost:5000/dronelog-backend:demo-2b463c944d55@sha256:75593ebc07b2d04fef4a3446073ca07d44e9ec28051ae9e06501243f46a91329   codespaces-d633fa   Shutdown        Complete 12 seconds ago
+2026-11-20T21:07:09.753397+00:00 [PASSED] self_healing: Stopped backend task replaced automatically by Swarm
+2026-11-20T21:07:09.772132+00:00 > docker service update --force --detach=true dronelog_db
+2026-11-20T21:07:09.794679+00:00 dronelog_db
+2026-11-20T21:07:20.057099+00:00 > HTTP GET http://localhost:8080/api/missions?limit=500
+2026-11-20T21:07:20.071173+00:00 > docker service ps --no-trunc dronelog_db
+2026-11-20T21:07:20.091408+00:00 ID                          NAME                IMAGE                                                                                               NODE                DESIRED STATE   CURRENT STATE            ERROR     PORTS
+p02fb0smugo83x6xbxdljoz4k   dronelog_db.1       postgres:17.12-alpine3.24@sha256:526f86d93c6ea08fd3f1fe5605650cacc781b2c6013169a0ad8f42c7d3d84f32   codespaces-d633fa   Running         Running 1 second ago               
+zrlf8qr0pbj2adgigu783yago    \_ dronelog_db.1   postgres:17.12-alpine3.24@sha256:526f86d93c6ea08fd3f1fe5605650cacc781b2c6013169a0ad8f42c7d3d84f32   codespaces-d633fa   Shutdown        Shutdown 6 seconds ago
+2026-11-20T21:07:20.091495+00:00 [PASSED] persistence: Database task recreated; same record and update survived
+2026-11-20T21:07:20.091589+00:00 > HTTP GET https://upgraded-goldfish-vjwqvwg7g4cw5jp-8080.app.github.dev/api/health
+2026-11-20T21:07:20.155452+00:00 > HTTP GET https://upgraded-goldfish-vjwqvwg7g4cw5jp-8080.app.github.dev/api/missions?limit=500
+2026-11-20T21:07:20.201871+00:00 [PASSED] public_http: Public URL HTTP check from the deployment computer
+2026-11-20T21:07:20.201936+00:00 > docker service scale --detach=true dronelog_backend=2
+2026-11-20T21:07:20.225250+00:00 dronelog_backend scaled to 2
+2026-11-20T21:07:20.263369+00:00 Evidence saved: /workspaces/dronelog-swarm/evidence/run_20261120T210650141472Z
+2026-11-20T21:07:20.263430+00:00 Still required: browser create/read, independent mobile-data URL check, screenshots and current submission links.

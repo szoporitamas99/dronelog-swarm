@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "project": "DroneLog",
+  "run_id": "20261120T210650141472Z",
+  "started_at": "2026-11-20T21:06:50.142340+00:00",
+  "finished_at": "2026-11-20T21:07:20.262920+00:00",
+  "environment": {
+    "docker_context": "default",
+    "node_id": "9fsetbtndw628pmjq6oy2d7sr",
+    "docker_server_version": "28.1.1-1",
+    "python_version": "3.12.1",
+    "single_node": true
+  },
+  "urls": {
+    "local": "http://localhost:8080",
+    "public": "https://upgraded-goldfish-vjwqvwg7g4cw5jp-8080.app.github.dev"
+  },
+  "checks": [
+    {
+      "id": "preflight",
+      "label": "Swarm manager and application readiness",
+      "status": "passed",
+      "details": {
+        "health": {
+          "status": "ok",
+          "database": "ok",
+          "instance": "f9c5232ad5b1",
+          "version": "1.0.0"
+        },
+        "original_backend_replicas": 2
+      },
+      "checked_at": "2026-11-20T21:06:50.562245+00:00"
+    },
+    {
+      "id": "functional_api",
+      "label": "Authenticated create, read and update; unauthenticated write rejected",
+      "status": "passed",
+      "details": {
+        "record_id": 4,
+        "title": "Swarm verification 20261120T210650141472Z",
+        "unauthorized_status": 401,
+        "updated_status": "completed"
+      },
+      "checked_at": "2026-11-20T21:06:50.623958+00:00"
+    },
+    {
+      "id": "scale",
+      "label": "Backend scaled from two to three running replicas",
+      "status": "passed",
+      "details": {
+        "from": 2,
+        "to": 3,
+        "running_task_ids": [
+          "fvhr1mmb1mzuscrkfhrbf0ebk",
+          "lj9awczfpgzs9pxihxo6xjii6",
+          "wepptm71sjlq7of7e382sy51a"
+        ]
+      },
+      "checked_at": "2026-11-20T21:06:56.894855+00:00"
+    },
+    {
+      "id": "self_healing",
+      "label": "Stopped backend task replaced automatically by Swarm",
+      "status": "passed",
+      "details": {
+        "stopped_container": "cb0436613036",
+        "stopped_task": "wepptm71sjlq7of7e382sy51a",
+        "replacement_task_ids": [
+          "7wcilnk4uz8rbewvqm0j4a7j2"
+        ],
+        "running_task_ids": [
+          "fvhr1mmb1mzuscrkfhrbf0ebk",
+          "lj9awczfpgzs9pxihxo6xjii6",
+          "7wcilnk4uz8rbewvqm0j4a7j2"
+        ],
+        "scope": "container replacement on one node"
+      },
+      "checked_at": "2026-11-20T21:07:09.753358+00:00"
+    },
+    {
+      "id": "persistence",
+      "label": "Database task recreated; same record and update survived",
+      "status": "passed",
+      "details": {
+        "old_task": "zrlf8qr0pbj2adgigu783yago",
+        "new_task": "p02fb0smugo83x6xbxdljoz4k",
+        "preserved_record_id": 4,
+        "volume": "dronelog_pgdata",
+        "same_node": "9fsetbtndw628pmjq6oy2d7sr"
+      },
+      "checked_at": "2026-11-20T21:07:20.091460+00:00"
+    },
+    {
+      "id": "public_http",
+      "label": "Public URL HTTP check from the deployment computer",
+      "status": "passed",
+      "details": {
+        "url": "https://upgraded-goldfish-vjwqvwg7g4cw5jp-8080.app.github.dev",
+        "health": {
+          "status": "ok",
+          "database": "ok",
+          "instance": "0c47af51855b",
+          "version": "1.0.0"
+        },
+        "matched_record_id": 4,
+        "independent_network_verified": false
+      },
+      "checked_at": "2026-11-20T21:07:20.201784+00:00"
+    }
+  ],
+  "manual_checks": {
+    "ui_create_and_read": {
+      "status": "pending"
+    },
+    "external_network": {
+      "status": "pending"
+    }
+  },
+  "test_record": {
+    "id": 4,
+    "title": "Swarm verification 20261120T210650141472Z"
+  },
+  "replica_restore": {
+    "from": 3,
+    "to": 2,
+    "status": "passed"
+  },
+  "evidence_files": {
+    "commands": "commands.txt"
+  },
+  "success": true,
+  "limitations": [
+    "Browser create/read demonstration is still required.",
+    "A public URL request from this host does not prove a separate mobile-network check.",
+    "Replacing a container on one node does not demonstrate node-level availability.",
+    "PostgreSQL uses a local volume on one labelled node; no database replication or backup is configured."
+  ]
+}

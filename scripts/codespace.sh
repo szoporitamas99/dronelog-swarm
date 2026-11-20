@@ -14,7 +14,11 @@ if ! docker container inspect dronelog-registry >/dev/null 2>&1; then
 else
   docker start dronelog-registry >/dev/null
 fi
-curl --fail --retry 10 --retry-all-errors http://127.0.0.1:5000/v2/
+for attempt in {1..15}; do
+  if curl -fsS http://127.0.0.1:5000/v2/ >/dev/null; then break; fi
+  sleep 1
+done
+curl -fsS http://127.0.0.1:5000/v2/
 if [[ "$(docker info --format '{{.Swarm.LocalNodeState}}')" == inactive ]]; then
   docker swarm init --advertise-addr eth0 --data-path-port 7789 >/dev/null
 fi

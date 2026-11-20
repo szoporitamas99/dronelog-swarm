@@ -48,3 +48,10 @@ jobs:
           name: dronelog-evidence
           path: evidence/run_*/
           if-no-files-found: warn
+      - name: Show service start errors
+        if: failure()
+        run: |
+          docker stack ps --no-trunc dronelog
+          for service in frontend backend db; do
+            docker service logs --tail 12 "dronelog_$service" || true
+          done

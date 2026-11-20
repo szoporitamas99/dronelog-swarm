@@ -13,8 +13,11 @@ services:
         protocol: tcp
         mode: ingress
     read_only: true
-    tmpfs:
-      - /tmp
+    volumes:
+      - type: tmpfs
+        target: /tmp
+        tmpfs:
+          size: 16777216
     cap_drop:
       - ALL
     healthcheck:
@@ -57,8 +60,11 @@ services:
       - app_net
       - data_net
     read_only: true
-    tmpfs:
-      - /tmp
+    volumes:
+      - type: tmpfs
+        target: /tmp
+        tmpfs:
+          size: 16777216
     cap_drop:
       - ALL
     healthcheck:
